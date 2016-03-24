@@ -25,15 +25,17 @@
  * be sure to save x to a temp variable
  */
 
-#define roundFunction(x, y, k) \
+#define roundFunction(x, y, tmp,k) \
+  tmp = (x); \
   x = (y) ^ f(x) ^ (k) ; \
-  y = (x)
+  y = (tmp)
 
 /*
  * Invert round function for decyption
  */
-#define invertRoundFunction(x, y, k) \
-  x = y ; \
-  y = (x) ^ f(y) ^ k 
+#define invertRoundFunction(x, y, tmp,k) \
+  tmp = (y); \
+  y = (x) ^ f(y) ^ k;\
+  x =(tmp) 
 
 #endif
