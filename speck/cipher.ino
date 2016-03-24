@@ -1,5 +1,5 @@
 
-#include "./../common/cipher.h"
+#include "cipher.h"
 #include "constants.h"
 #include "speck_macro.h"
 
@@ -8,10 +8,10 @@
  * inputKey: the original keys
  * keys: round keys
  */
-void encryptKeySchedule(const u8 * inputKey, u8 * keys ) {
+void encryptKeySchedule(const uint8_t * inputKey, uint8_t * keys ) {
 	
-	u32 *rk = (u32*)keys;
-	const u32 *ik = (const u32*)inputKey;
+	uint32_t *rk = (uint32_t*)keys;
+	const uint32_t *ik = (const uint32_t*)inputKey;
 	
 	u32 l[SPECK_ROUNDS+SPECK_KEY_WORDS-2];
 	rk[0] = ik[0];
@@ -33,9 +33,9 @@ void encryptKeySchedule(const u8 * inputKey, u8 * keys ) {
  * plainText: plainText has just one block.
  * keys: round keys
  */
-void encrypt(u8 * plainText, const u8 * keys ) {
-	u32 *plain = (u32*)plainText;
-	const u32* rk = (const u32*)keys;
+void encrypt(uint8_t * plainText, const uint8_t * keys ) {
+	uint64_t *plain = (uint64_t*)plainText;
+	const uint64_t* rk = (const uint64_t*)keys;
 	
 	int i;
 	for ( i = 0; i < SPECK_ROUNDS; i++ ) {
@@ -48,9 +48,9 @@ void encrypt(u8 * plainText, const u8 * keys ) {
  * cipherText: cipherText has just one block.
  * keys: round keys
  */
-void decrypt(u8 * cipherText, const u8 * keys ) {
-	u32 *cipher = (u32*)cipherText;
-	const u32* rk = (const u32*)keys;
+void decrypt(uint8_t * cipherText, const uint8_t * keys ) {
+	uint64_t *cipher = (uint64_t*)cipherText;
+	const uint64_t* rk = (const uint64_t*)keys;
 	
 	int i;
 	for ( i = SPECK_ROUNDS-1; i >= 0; i-- ) {
@@ -59,3 +59,29 @@ void decrypt(u8 * cipherText, const u8 * keys ) {
 		//cipher[1] = rol(((cipher[1] ^ rk[i]) - cipher[0]), SPECK_A);
 	}
 }
+
+//Helpers
+
+void getUserInput(char buffer[],uint8_t maxSize){
+  memset(buffer,0,maxSize);
+  while(Serial.available()==0)
+  {
+    delay(1);
+   }
+  uint8_t count=0;
+  do
+  {
+    count += Serial.readBytes(buffer+count,maxSize);
+    delay(1);
+  }while((count<maxSize) && !(Serial.available()==0));
+  }
+
+void printArr(uint8_t arr[],char* txt){
+    Serial.print(txt);
+    
+     for(int i=0;i<16;i++){
+        Serial.print(arr[i],HEX);
+        Serial.print(" ");
+        }
+        Serial.println("");
+   }

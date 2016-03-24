@@ -14,14 +14,16 @@
 #define ror(x, n) (((x)>>(n)) | ((x)<<(SPECK_WORD_SIZE-(n))))
 
 /*
- * round function
+ * round function for encryption
+ * Rk(x, y) = ((S−αx + y) ⊕ k, Sβy ⊕ (S−αx + y) ⊕ k)
  */
 #define roundFunction(x, y, k)		\
 	x = (ror((x), SPECK_A) + (y)) ^ (k);	\
 	y = rol((y), SPECK_B) ^ (x)
 
 /*
- * invert round function
+ * invert round function for decryption
+ * R−1k(x, y) = (Sα((x ⊕ k) − S−β(x ⊕ y)), S−β(x ⊕ y))
  */
 #define invertRoundFunction(x, y, k)	\
 	y = ror( (x)^(y), SPECK_B);	\
