@@ -94,31 +94,75 @@ Serial.println("[OK] Connected!\n");
 }
 
 
+//cpu temp//
+
+
+double GetTemp(void)
+{
+  unsigned int wADC;
+  double t;
+
+  // The internal temperature has to be used
+  // with the internal reference of 1.1V.
+  // Channel 8 can not be selected with
+  // the analogRead function yet.
+
+  // Set the internal reference and mux.
+  ADMUX = (_BV(REFS1) | _BV(REFS0) | _BV(MUX3));
+  ADCSRA |= _BV(ADEN);  // enable the ADC
+
+  delay(20);            // wait for voltages to become stable.
+
+  ADCSRA |= _BV(ADSC);  // Start the ADC
+
+  // Detect end-of-conversion
+  while (bit_is_set(ADCSRA,ADSC));
+
+  // Reading register "ADCW" takes care of how to read ADCL and ADCH.
+  wADC = ADCW;
+
+  // The offset of 324.31 could be wrong. It is just an indication.
+  t = (wADC - 324.31 ) / 1.22;
+
+  // The returned temperature is in degrees Celsius.
+  return (t);
+}
 
 //Main
 
 void loop()
 {
-  Serial.println(F(">>Enter message to send..."));
+  /*Serial.println(F(">>Enter message to send..."));
   char txt[BUFSIZE+1];
   getUserInput(txt,BUFSIZE);
   
 for(int i = 0; i < sizeof(txt)-1 ; i++){
   Serial.println(uint8_t(txt[i]));
   }
-  
+*/
+  /*uint8_t txt[BUFSIZE+1];
+  Serial.println("Recording CPU temp\n");
+  for (int i = 0 ; i<16 ; i++){
+    txt[i] = (uint8_t)(GetTemp()); //casting from double to uint8_t should be checked 
+    Serial.print("Cpu temp = ");
+    Serial.println((uint8_t)GetTemp());
+    delay(1000);
+    }
+  */
   // encrypt
 
   char msg_enc_snd[BUFSIZE+1];
     
-    uint8_t inputKey[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 ,0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
-    uint8_t keys[SIMON_BLOCK_SIZE/16*SIMON_ROUNDS];
-    uint8_t plainText[BUFSIZE+1]; 
+    uint8_t inputKey[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
     
+    uint8_t keys[SIMON_BLOCK_SIZE/16*SIMON_ROUNDS];
+    /*uint8_t plainText[BUFSIZE+1]; */
+    uint8_t plainText[]={0x63,0x73,0x65,0x64,0x20,0x73,0x72,0x65,0x6c,0x6c,0x65,0x76,0x61,0x72,0x74,0x20};
+    /*
     for(int i = 0 ; i < 16 ; i++ ){
-      plainText[i] = uint8_t(txt[i]);
+      plainText[i] = (uint8_t)txt[i];
       }
-      
+      */
     encryptKeySchedule(inputKey, keys);
     
     printArr(plainText,"PlainText: ");
