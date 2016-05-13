@@ -45,8 +45,8 @@ void encryptKeySchedule(const uint8_t * inputKey, uint8_t * keys ) {
 
 void encrypt(uint8_t * plainText, const uint8_t * keys ) {
 
-	uint64_t *plain = (uint64_t*)plainText;
-	const uint64_t *rk = (const uint64_t*)keys;
+	uint32_t *plain = (uint32_t*)plainText;
+	const uint32_t *rk = (const uint32_t*)keys;
 
 	int i;
 	for ( i = 0; i < SIMON_ROUNDS; i+=2 ) {
@@ -59,8 +59,8 @@ void encrypt(uint8_t * plainText, const uint8_t * keys ) {
 
 void decrypt(uint8_t * cipherText, const uint8_t * keys ) {
 
-	uint64_t *cipher = (uint64_t*)cipherText;
-	const uint64_t *rk = (const uint64_t*)keys;    
+	uint32_t *cipher = (uint32_t*)cipherText;
+	const uint32_t *rk = (const uint32_t*)keys;    
 	
 	int i;
 	for ( i = SIMON_ROUNDS-1; i >= 0; i-=2 ) {
@@ -89,7 +89,7 @@ void getUserInput(char buffer[],uint8_t maxSize){
 void printArr(uint8_t arr[],char* txt){
     Serial.print(txt);
     
-     for(int i=0;i<16;i++){
+     for(int i=0;i<8;i++){
         Serial.print(arr[i],HEX);
         Serial.print(" ");
         }

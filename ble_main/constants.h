@@ -6,7 +6,7 @@
  SIMON_WORD_SIZE n = word size (16, 24, 32, 48, or 64)
  */ 
  
-#define SIMON_WORD_SIZE (64)
+#define SIMON_WORD_SIZE (32)
 
 /*
 SIMON_KEY_WORDS m = number of key words (must be 4 if n = 16,
@@ -14,7 +14,7 @@ SIMON_KEY_WORDS m = number of key words (must be 4 if n = 16,
                                           2 or 3 if n = 48,
                                           2, 3, or 4 if n = 64)
 */
-#define SIMON_KEY_WORDS (2)
+#define SIMON_KEY_WORDS (4)
 
 #define SIMON_BLOCK_SIZE (SIMON_WORD_SIZE*2) 
 
@@ -39,8 +39,8 @@ j = SIMON_SEQUENCE_NUMBER
  * page 10 from "The Simon and Speck Families of Lightweight Block Ciphers"  
  */
 
-#define SIMON_ROUNDS (68)
-#define SIMON_SEQUENCE_NUMBER (2)
+#define SIMON_ROUNDS (44)
+#define SIMON_SEQUENCE_NUMBER (3)
 
 
 #endif
