@@ -21,8 +21,18 @@
 #define MODE_LED_BEHAVIOUR          "MODE"
 #define TEMP_OFFSET -7
 
+
+/* globals */
+volatile byte ble_read_trigger = 0;
+const byte interruptPin = 7;
+
 /* ...hardware SPI, using SCK/MOSI/MISO hardware SPI pins and then user selected CS/IRQ/RST */
 Adafruit_BluefruitLE_SPI ble(BLUEFRUIT_SPI_CS, BLUEFRUIT_SPI_IRQ, BLUEFRUIT_SPI_RST);
+
+void my_ble_ISR(){
+  Serial.println("i am the ble isr");
+  ble_read_trigger = 1;
+  }
 
 
 // A small helper
@@ -31,13 +41,20 @@ void error(const __FlashStringHelper*err) {
   while (1);
 }
 
+
 void setup(void)
 {
   while (!Serial);  // required for Flora & Micro
   delay(500);
-  
   Serial.begin(115200);
+  
   setupADC();
+  //configure ble interrupt
+  //pinMode(interruptPin, INPUT_PULLUP);
+  //digitalPinToInterrupt(interruptPin)
+  //attachInterrupt(digitalPinToInterrupt(BLUEFRUIT_SPI_IRQ), my_ble_ISR, RISING);
+  
+  
   Serial.println(F("Adafruit Bluefruit Command <-> Data Mode Example"));
   Serial.println(F("------------------------------------------------"));
 
@@ -133,48 +150,48 @@ int getTemp(){
   return temperature - 273 + TEMP_OFFSET;
 }
 
+
+
+
 //Main
 
 void loop()
-{
-  //Serial.println(getTemp());
-  // Echo received data
-  
-  //while ( ble.available() )
-  //{
-    int c = ble.read();
-    //Serial.print((char)c);
-    if(c == 'r'){
+{   //Serial.println(ble_read_trigger);
+    //int c;
+    while (ble.available()) {
+        Serial.println("ble rx triggered");
+        int c = ble.read();
+        Serial.println(c);
+        if(c == 'r'){
         Serial.println(">>Request received, sending data...");
         uint8_t txt[BUFSIZE+1];
-        
-      Serial.println("Recording CPU temp\n");
-  
-      for (int i = 0 ; i<8 ; i++){
-        txt[i] = (uint8_t)(getTemp()); //casting from double to uint8_t should be checked 
+      
+      Serial.println("Recording sensor values...\n");
+        //cpu temp
+        txt[0] = (uint8_t)(getTemp());
         Serial.print("Cpu temp = ");
-        Serial.println(getTemp());
-        delay(500);
-    }
-  
+        Serial.println(txt[0]);
+        //water pressure
+        txt[1] = (uint8_t)(random(70,90));
+        Serial.print("Water pressure = ");
+        Serial.println(txt[1]);
+        //room temp
+        for(int i = 0; i < 6; i++){
+        txt[i+2] = (uint8_t)(random(20,30));
+        Serial.print("Room ");
+        Serial.print(i);
+        Serial.print(" temp = ");
+        Serial.println(txt[i+2]);
+        }
   // encrypt
 
-  char msg_enc_snd[BUFSIZE+1];
+    char msg_enc_snd[BUFSIZE+1];
     
     uint8_t inputKey[] = {0x00, 0x01, 0x02, 0x03, 0x08, 0x09, 0x0a, 0x0b, 0x10, 0x11, 0x12, 0x13, 0x18, 0x19, 0x1a, 0x1b};
     
     uint8_t keys[SIMON_BLOCK_SIZE/16*SIMON_ROUNDS];
     uint8_t plainText[BUFSIZE+1];
     
-    /*uint8_t plainText[BUFSIZE+1]; */
-    /*
-    if(txt[0]=='1'){
-    uint8_t plainText[]={0x75, 0x6e, 0x64, 0x20, 0x6c, 0x69, 0x6b, 0x65};
-    }
-    else{
-      uint8_t plainText[]={0x75, 0x10, 0x64, 0x18, 0x6c, 0x69, 0x6b, 0x65};
-      }
-    */
     for(int i = 0 ; i < 8 ; i++ ){
       plainText[i] = (uint8_t)txt[i];
       }
@@ -193,35 +210,12 @@ void loop()
   
   // send over ble
 
-  //msg_enc_snd[16]=0;
   ble.print(msg_enc_snd);
-      }
-      /*else{
-        Serial.print(">>Unknown request: ");
-        Serial.println(c);
-        delay(500);
-        }*/ 
-    /*
-    // Hex output too, helps w/debugging!
-    Serial.print(" [0x");
-    if (c <= 0xF) Serial.print(F("0"));
-    Serial.print(c, HEX);
-    Serial.print("] ");
-    */
-  //}
-
-  /*
-  Serial.println(F(">>Pres key to send..."));
-  char txt[BUF_CHR_SIZE+1];
-  getUserInput(txt,BUF_CHR_SIZE);
   
-for(int i = 0; i < sizeof(txt)-1 ; i++){
-  Serial.println(uint8_t(txt[i]));
+    
+    }
+    ble_read_trigger = 0;
   }
-*/
-
-  
-  }
-
+}
 
 
