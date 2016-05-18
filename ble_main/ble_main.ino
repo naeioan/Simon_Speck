@@ -179,7 +179,7 @@ void loop()
         for(int i = 0; i < 6; i++){
         txt[i+2] = (uint8_t)(random(20,30));
         Serial.print("Room ");
-        Serial.print(i);
+        Serial.print(i+1);
         Serial.print(" temp = ");
         Serial.println(txt[i+2]);
         }
@@ -209,12 +209,8 @@ void loop()
     } 
   
   // send over ble
-
   ble.print(msg_enc_snd);
-  
-    
     }
-    ble_read_trigger = 0;
   }
 }
 
