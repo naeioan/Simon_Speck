@@ -156,14 +156,13 @@ int getTemp(){
 //Main
 
 void loop()
-{   //Serial.println(ble_read_trigger);
-    //int c;
-    while (ble.available()) {
-        Serial.println("ble rx triggered");
-        int c = ble.read();
-        Serial.println(c);
-        if(c == 'r'){
-        Serial.println(">>Request received, sending data...");
+{ 
+    //while (ble.available()) {
+    //    Serial.println("ble rx triggered");
+    //    int c = ble.read();
+    //    Serial.println(c);
+    //    if(c == 'r'){
+     //   Serial.println(">>Request received, sending data...");
         uint8_t txt[BUFSIZE+1];
       
       Serial.println("Recording sensor values...\n");
@@ -205,13 +204,14 @@ void loop()
   
   for(int i = 0;i < 8 ;i++){
     msg_enc_snd[i] = char(plainText[i]);
-    Serial.println(char(plainText[i]));
+    Serial.print(char(plainText[i]));
     } 
   
   // send over ble
   ble.print(msg_enc_snd);
-    }
-  }
+    //}
+  //}
+  delay(2000);
 }
 
 
